@@ -33,7 +33,7 @@ class UserService
     {
         $user = $this->getUserById($userId);
         if(!empty($user)){
-            return $user->getUserType()->getRoleType() == "admin";
+            return $user->getUserType()->getRoleType() == "Admin";
         }
         throw new InternalErrorException("User does not exist");
     }

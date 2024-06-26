@@ -34,29 +34,26 @@ class UserController extends AbstractController
     public function generateJwt($user): ?array
     {
         $secret_key = "IT_IS_A_SECRET";
-        $issuer = "RecipeBook.com";
-        $audience = "RecipeBook.com/Website";
         $issuedAt = time();
-        $notBefore = $issuedAt + 1500;
+        $notBefore = $issuedAt; // Set nbf to the current time
 
         $payload = array(
-            "iss" => $issuer,
-            "aud" => $audience,
             "iat" => $issuedAt,
-            "nbf" => $notBefore,
+            "nbf" => $notBefore, // Use current time for nbf
             "data" => array(
                 "id" => $user->getId(),
                 "username" => $user->getUsername()
-            ));
+            )
+        );
         $jwt = JWT::encode($payload, $secret_key, 'HS256');
-        return
-            array(
-                "message" => "Successful login.",
-                "jwt" => $jwt,
-                "name" => $user->getUsername(),
-                "expiresAt" => $notBefore,
-            );
+        return array(
+            "message" => "Successful login.",
+            "jwt" => $jwt,
+            "name" => $user->getUsername(),
+            "expiresAt" => $issuedAt + 3600, // Token valid for 1 hour
+        );
     }
+
 
     public function getAll()
     {
