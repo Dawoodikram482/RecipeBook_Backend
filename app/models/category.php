@@ -12,12 +12,7 @@ enum category: string
 
     public static function getCategoryType(self $value): string
     {
-        return match ($value->value) {
-            self::Breakfast => 'Breakfast',
-            self::Lunch => 'Lunch',
-            self::Dinner => 'Dinner',
-            default => throw new \InvalidArgumentException("Invalid category value: $value"),
-        };
+        return $value->value;
     }
 
     public static function createFrom(string $value): category

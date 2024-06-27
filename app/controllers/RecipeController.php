@@ -63,7 +63,7 @@ class RecipeController extends AbstractController
             return $this->respondWithError(401, "Unauthorized");
         }
         $json = file_get_contents('php://input');
-        $recipeDetails = json_decode($json);
+        $recipeDetails = $this->sanitize(json_decode($json));
         if (!$recipeDetails) {
             return $this->respondWithError(400, "Invalid JSON data");
         }
@@ -101,7 +101,7 @@ class RecipeController extends AbstractController
             return $this->respondWithError(401, "Unauthorized");
         }
         try {
-            $recipes = $this->recipeService->getRecipesByUser($token->data->Id, $limit, $offset);
+            $recipes = $this->recipeService->getRecipesByUser($token->data->id, $limit, $offset);
             if (empty($recipes)) {
                 return $this->respondWithError(204, "No recipes found");
             }
@@ -112,8 +112,16 @@ class RecipeController extends AbstractController
     }
     public function getRecipesByCategory()
     {
+        $requestBody = file_get_contents('php://input');
+        $data = $this->sanitize(json_decode($requestBody, true));
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            return $this->respondWithError(400, "Invalid JSON input");
+        }
+        if (!isset($data['category']) || !is_string($data['category'])) {
+            return $this->respondWithError(400, "Category is required and must be a string");
+        }
+        $category = category::createFrom($data['category']);
 
-        $category = category::createFrom($_GET['category']);
         try {
             $recipes = $this->recipeService->getRecipeByCategory($category);
             if (empty($recipes)) {
