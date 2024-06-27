@@ -80,9 +80,23 @@ class UserController extends AbstractController
                 return;
             }
             $this->respondWithError(403, "You are not authorized to view this page");
-        }
-        catch (\Models\Exceptions\InternalErrorException $e) {
+        } catch (\Models\Exceptions\InternalErrorException $e) {
             $this->respondWithError(500, "Internal Error");
         }
+    }
+
+    public function create()
+    {
+        $postedUser = $this->getSanitizedData();
+        try {
+            $user = $this->userService->createNewUser($postedUser);
+            if (empty($user)) {
+                $this->respondWithError(500, "Internal Error Try Again Later");
+                return;
+            }
+        } catch (\Models\Exceptions\InternalErrorException $e) {
+            $this->respondWithError(500, $e->getMessage());
+        }
+        $this->respond($user);
     }
 }

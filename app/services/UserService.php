@@ -2,6 +2,7 @@
 
 namespace Services;
 
+use Models\Exceptions\AlreadyExistsException;
 use Models\Exceptions\InternalErrorException;
 use Repositories\UserRepository;
 
@@ -36,5 +37,12 @@ class UserService
             return $user->getUserType()->getRoleType() == "Admin";
         }
         throw new InternalErrorException("User does not exist");
+    }
+    public function createNewUser($userDetails): ?\Models\User
+    {
+        if($this->CheckUserExistence($userDetails->username)){
+            throw new AlreadyExistsException("This username already exist with us");
+        }
+        return $this->repository->addUser($userDetails);
     }
 }

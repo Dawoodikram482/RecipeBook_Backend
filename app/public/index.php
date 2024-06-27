@@ -25,5 +25,10 @@ $router->get($base.'/recipes/user', 'RecipeController@getRecipesByUser');
 $router->get($base.'/recipes/category', 'RecipeController@getRecipesByCategory');
 $router->put($base.'/recipes/(\d+)', 'RecipeController@updateRecipe');
 $router->delete($base.'/recipes/(\d+)', 'RecipeController@deleteRecipe');
+$router->options('.*', function() {
+    header("Access-Control-Allow-Origin: *");
+    header("Access-Control-Allow-Headers: *");
+    header("Access-Control-Allow-Methods: *");
+});
 $router->run();
 ?>

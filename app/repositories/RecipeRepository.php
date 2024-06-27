@@ -5,6 +5,7 @@ namespace Repositories;
 use Cassandra\Date;
 use DateTime;
 use Exception;
+use InvalidArgumentException;
 use Models\category;
 use Models\Exceptions\InternalErrorException;
 use Models\Exceptions\ObjectCreationException;
@@ -120,7 +121,7 @@ class RecipeRepository extends AbstractRepository
             ":Ingredients" => $recipe->Ingredients,
             ":Instructions" => $recipe->Instructions,
             ":Image" => $recipe->Image,
-            ":Category" => category::getCategoryType($recipe->Category), // get the category type from the category enum (category.php
+            ":Category" => $recipe->Category, // get the category type from the category enum (category.php
             ":user_id" => $recipe->user_id,
         ];
         $result = $this->ExecQueryAndGetResults($query, $params, false, true);
@@ -146,21 +147,27 @@ class RecipeRepository extends AbstractRepository
      * @throws InternalErrorException
      * @throws ObjectCreationException
      */
-    public function updateRecipe($recipe, $recipeId): ?recipe
+    public function updateRecipe($recipeId, $recipe): ?recipe
     {
+        // Validate that $recipe is an object and not a string
+        if (!is_object($recipe)) {
+            throw new InvalidArgumentException("Expected recipe to be an object, " . gettype($recipe) . " given");
+        }
+
         $query = "UPDATE Recipe SET RecipeTitle = :RecipeTitle, Ingredients = :Ingredients, Instructions = :Instructions, Image = :Image, Category = :Category, user_id = :user_id WHERE RecipeId = :RecipeId";
         $params = [
             ":RecipeTitle" => $recipe->RecipeTitle,
             ":Ingredients" => $recipe->Ingredients,
             ":Instructions" => $recipe->Instructions,
             ":Image" => $recipe->Image,
-            ":Category" => category::getCategoryType($recipe->Category),
+            ":Category" => $recipe->Category,
             ":user_id" => $recipe->user_id,
             ":RecipeId" => $recipeId
         ];
         $result = $this->ExecQueryAndGetResults($query, $params);
-        return is_bool($result) ? $this->getRecipeById($recipeId) : throw  new InternalErrorException("Something went wrong  in App while updating recipe");
+        return is_bool($result) ? $this->getRecipeById($recipeId) : throw  new InternalErrorException("Something went wrong in App while updating recipe");
     }
+
 
     /**
      * @throws ObjectCreationException

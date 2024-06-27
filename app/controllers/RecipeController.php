@@ -62,10 +62,18 @@ class RecipeController extends AbstractController
         if (empty($token)) {
             return $this->respondWithError(401, "Unauthorized");
         }
-        $recipeDetails = $this->sanitize($_POST['recipeDetails']);
-        $recipeDetails->userId = $token->data->Id;
-        $recipeDetails->Image = $_FILES['image'];
-        $recipeDetails->Category = category::createFrom($recipeDetails->Category);
+        $json = file_get_contents('php://input');
+        $recipeDetails = json_decode($json);
+        if (!$recipeDetails) {
+            return $this->respondWithError(400, "Invalid JSON data");
+        }
+
+        // Assign user_id from token
+        if (isset($token->data->id)) {
+            $recipeDetails->user_id = $token->data->id;
+        } else {
+            return $this->respondWithError(401, "Unauthorized: Invalid user ID in token");
+        }
         try {
             $recipe = $this->recipeService->createNewRecipe($recipeDetails);
             if (!empty($recipe)) {
@@ -122,10 +130,19 @@ class RecipeController extends AbstractController
         if (empty($token)) {
             return $this->respondWithError(401, "Unauthorized");
         }
-        $recipeDetails = $this->sanitize($_POST['recipeDetails']);
-        $recipeDetails->userId = $token->data->Id;
-        $recipeDetails->Image = $_FILES['image'];
-        $recipeDetails->Category = category::createFrom($recipeDetails->Category);
+        $requestBody = file_get_contents('php://input');
+        $recipeDetails = $this->sanitize(json_decode($requestBody));
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            return $this->respondWithError(400, "Invalid JSON input");
+        }
+        if (!empty($recipeDetails->Image)) {
+            $recipeDetails->Image = $recipeDetails->Image;
+        }
+        if (isset($token->data->id)) {
+            $recipeDetails->user_id = $token->data->id;
+        } else {
+            return $this->respondWithError(401, "Unauthorized: Invalid user ID in token");
+        }
         try {
             $recipe = $this->recipeService->updateRecipe($id, $recipeDetails);
             if (!empty($recipe)) {
@@ -137,6 +154,8 @@ class RecipeController extends AbstractController
             $this->respondWithError(500, $e->getMessage());
         }
     }
+
+
     public function deleteRecipe($id)
     {
         $token = $this->checkForJwt();
