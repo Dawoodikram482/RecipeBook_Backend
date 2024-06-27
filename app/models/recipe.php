@@ -10,7 +10,7 @@ class recipe implements \JsonSerializable
     private string $RecipeTitle;
     private string $Ingredients;
     private string $Instructions;
-    private string $Image;
+    public string $Image;
     private user $User;
     private category $Category;
     private DateTime $Createdate;

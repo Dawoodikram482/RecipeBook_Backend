@@ -56,24 +56,31 @@ class RecipeController extends AbstractController
         }
     }
 
+
     public function createRecipe()
     {
         $token = $this->checkForJwt();
         if (empty($token)) {
             return $this->respondWithError(401, "Unauthorized");
         }
-        $json = file_get_contents('php://input');
-        $recipeDetails = $this->sanitize(json_decode($json));
-        if (!$recipeDetails) {
+        $recipeDetails = json_decode($_POST['recipeDetails']);
+        if (json_last_error() !== JSON_ERROR_NONE) {
             return $this->respondWithError(400, "Invalid JSON data");
         }
-
-        // Assign user_id from token
         if (isset($token->data->id)) {
             $recipeDetails->user_id = $token->data->id;
         } else {
             return $this->respondWithError(401, "Unauthorized: Invalid user ID in token");
         }
+        if (!isset($_FILES['Image']) || $_FILES['Image']['error'] !== UPLOAD_ERR_OK) {
+            return $this->respondWithError(400, "Invalid or missing image upload");
+        }
+        $imagePath = 'images/' . $_FILES['Image']['name'];
+        if (!move_uploaded_file($_FILES['Image']['tmp_name'], $imagePath)) {
+            return $this->respondWithError(500, "Failed to move uploaded file");
+        }
+        $imageNewName =  "recipe_book_" . uniqid();
+        $recipeDetails->Image = $imageNewName;
         try {
             $recipe = $this->recipeService->createNewRecipe($recipeDetails);
             if (!empty($recipe)) {
@@ -85,6 +92,8 @@ class RecipeController extends AbstractController
             $this->respondWithError(500, $e->getMessage());
         }
     }
+
+
 
     public function getRecipesByUser()
     {
@@ -151,10 +160,38 @@ class RecipeController extends AbstractController
         } else {
             return $this->respondWithError(401, "Unauthorized: Invalid user ID in token");
         }
+        $imageUpdated = false;
+        if (isset($_FILES['Image']) && $_FILES['Image']['error'] === UPLOAD_ERR_OK) {
+            $imagePath = 'images/' . $_FILES['Image']['name'];
+            if (move_uploaded_file($_FILES['Image']['tmp_name'], $imagePath)) {
+                $imageNewName = "recipe_book_" . uniqid();
+                $recipeDetails->Image = $imageNewName;
+                $imageUpdated = true;
+            } else {
+                return $this->respondWithError(500, "Failed to move uploaded file");
+            }
+        }
+
         try {
-            $recipe = $this->recipeService->updateRecipe($id, $recipeDetails);
-            if (!empty($recipe)) {
-                $this->respond($recipe);
+            $recipe = $this->recipeService->getRecipeById($id); // Assuming you have a method like this in recipeService
+            if (!$recipe) {
+                return $this->respondWithError(404, "Recipe not found");
+            }
+            if ($imageUpdated) {
+                // Delete previous image if exists
+                if (!empty($recipe->Image)) {
+                    $previousImagePath = 'images/' . $recipe->Image;
+                    if (file_exists($previousImagePath)) {
+                        unlink($previousImagePath);
+                    }
+                }
+            } else {
+                $recipeDetails->Image = $recipe->Image;
+            }
+
+            $updatedRecipe = $this->recipeService->updateRecipe($id,$recipeDetails);
+            if (!empty($updatedRecipe)) {
+                $this->respond($updatedRecipe);
             } else {
                 $this->respondWithError(500, "Error updating recipe");
             }
