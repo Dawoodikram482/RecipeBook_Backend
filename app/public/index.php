@@ -17,6 +17,7 @@ $base = '/api';
 // User Management endpoints
 $router->post($base.'/users/login', 'UserController@login');
 $router->get($base.'/users', 'UserController@getAll');
+$router->post($base.'/users/register', 'UserController@create');
 
 $router->get($base.'/recipes', 'RecipeController@getAll');
 $router->get($base.'/recipes/(\d+)', 'RecipeController@getOneRecipe');

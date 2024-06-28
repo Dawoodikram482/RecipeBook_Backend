@@ -7,7 +7,6 @@
       <sourceFolder url="file://$MODULE_DIR$/app/models" isTestSource="false" packagePrefix="Models\" />
       <sourceFolder url="file://$MODULE_DIR$/app/models/exceptions" isTestSource="false" packagePrefix="Models\Exceptions\" />
       <sourceFolder url="file://$MODULE_DIR$/app/repositories" isTestSource="false" packagePrefix="Repositories\" />
-      <sourceFolder url="file://$MODULE_DIR$/app/routers" isTestSource="false" packagePrefix="Routers\" />
       <sourceFolder url="file://$MODULE_DIR$/app/services" isTestSource="false" packagePrefix="Services\" />
       <excludeFolder url="file://$MODULE_DIR$/app/vendor/bramus/router" />
       <excludeFolder url="file://$MODULE_DIR$/app/vendor/composer" />

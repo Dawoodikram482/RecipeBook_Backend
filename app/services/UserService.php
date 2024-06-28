@@ -4,6 +4,8 @@ namespace Services;
 
 use Models\Exceptions\AlreadyExistsException;
 use Models\Exceptions\InternalErrorException;
+use Models\role;
+use Models\user;
 use Repositories\UserRepository;
 
 class UserService
@@ -38,11 +40,17 @@ class UserService
         }
         throw new InternalErrorException("User does not exist");
     }
-    public function createNewUser($userDetails): ?\Models\User
+    public function createNewUser($userDetails): ?User
     {
-        if($this->CheckUserExistence($userDetails->username)){
-            throw new AlreadyExistsException("This username already exist with us");
+        // Check if user already exists
+        if ($this->checkUserExistence($userDetails->username)) {
+            throw new AlreadyExistsException("This username already exists.");
         }
-        return $this->repository->addUser($userDetails);
+
+        // Set role to Admin using enum
+        $userDetails->role = role::admin;
+
+        // Add user to repository
+        return $this->createNewUser($userDetails);
     }
 }

@@ -76,7 +76,7 @@ $query = "SELECT id, username, password, email, role FROM users WHERE id = :id";
             ":username"=>$userDetails->username,
             ":password"=>$hashedPassword,
             ":email"=>$userDetails->email,
-            ":role"=>role::createFrom($userDetails->role)
+            ":role"=>$userDetails->role->getRoleType()
         );
         $result = $this->ExecQueryAndGetResults($query, $parameters, false, true);
         if (is_numeric($result)) {
