@@ -119,20 +119,17 @@ class RecipeController extends AbstractController
             $this->respondWithError(500, $e->getMessage());
         }
     }
-    public function getRecipesByCategory()
-    {
-        $requestBody = file_get_contents('php://input');
-        $data = $this->sanitize(json_decode($requestBody, true));
-        if (json_last_error() !== JSON_ERROR_NONE) {
-            return $this->respondWithError(400, "Invalid JSON input");
-        }
-        if (!isset($data['category']) || !is_string($data['category'])) {
+    public function getRecipesByCategory() {
+        $category = $_GET['category'] ?? null; // Retrieve category from query parameters
+
+        if (!isset($category) || !is_string($category)) {
             return $this->respondWithError(400, "Category is required and must be a string");
         }
-        $category = category::createFrom($data['category']);
+
+        $categoryObject = Category::createFrom($category); // Adjust this line based on your application's logic
 
         try {
-            $recipes = $this->recipeService->getRecipeByCategory($category);
+            $recipes = $this->recipeService->getRecipeByCategory($categoryObject);
             if (empty($recipes)) {
                 return $this->respondWithError(204, "No recipes found");
             }
@@ -141,6 +138,8 @@ class RecipeController extends AbstractController
             $this->respondWithError(500, $e->getMessage());
         }
     }
+
+
     public function updateRecipe($id)
     {
         $token = $this->checkForJwt();
