@@ -51,6 +51,6 @@ class UserService
         $userDetails->role = role::admin;
 
         // Add user to repository
-        return $this->createNewUser($userDetails);
+        return $this->repository->addUser($userDetails);
     }
 }
