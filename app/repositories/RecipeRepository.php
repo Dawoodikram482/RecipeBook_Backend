@@ -154,12 +154,11 @@ class RecipeRepository extends AbstractRepository
             throw new InvalidArgumentException("Expected recipe to be an object, " . gettype($recipe) . " given");
         }
 
-        $query = "UPDATE Recipe SET RecipeTitle = :RecipeTitle, Ingredients = :Ingredients, Instructions = :Instructions, Image = :Image, Category = :Category, user_id = :user_id WHERE RecipeId = :RecipeId";
+        $query = "UPDATE Recipe SET RecipeTitle = :RecipeTitle, Ingredients = :Ingredients, Instructions = :Instructions, Category = :Category, user_id = :user_id WHERE RecipeId = :RecipeId";
         $params = [
             ":RecipeTitle" => $recipe->RecipeTitle,
             ":Ingredients" => $recipe->Ingredients,
             ":Instructions" => $recipe->Instructions,
-            ":Image" => $recipe->Image,
             ":Category" => $recipe->Category,
             ":user_id" => $recipe->user_id,
             ":RecipeId" => $recipeId
