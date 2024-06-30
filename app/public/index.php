@@ -18,6 +18,7 @@ $base = '/api';
 $router->post($base.'/users/login', 'UserController@login');
 $router->get($base.'/users', 'UserController@getAll');
 $router->post($base.'/users/register', 'UserController@create');
+$router->delete($base.'/users/(\d+)', 'UserController@delete');
 
 $router->get($base.'/recipes', 'RecipeController@getAll');
 $router->get($base.'/recipes/(\d+)', 'RecipeController@getOneRecipe');

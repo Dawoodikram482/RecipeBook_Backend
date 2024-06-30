@@ -16,30 +16,36 @@ class UserService
     {
         $this->repository = new UserRepository();
     }
+
     public function verifyAndGetUser($username, $password): ?\Models\User
     {
         return $this->repository->authenticateAndGetUser($username, $password);
     }
+
     public function getAllUsers($limit, $offset): ?array
     {
         return $this->repository->getAllUsers($limit, $offset);
     }
+
     public function CheckUserExistence($username): bool
     {
         return $this->repository->checkIfUserExist($username);
     }
+
     public function getUserById($userId): ?\Models\user
     {
         return $this->repository->getUserById($userId);
     }
+
     public function checkIfUserIsAdmin($userId): bool
     {
         $user = $this->getUserById($userId);
-        if(!empty($user)){
+        if (!empty($user)) {
             return $user->getUserType()->getRoleType() == "Admin";
         }
         throw new InternalErrorException("User does not exist");
     }
+
     public function createNewUser($userDetails): ?User
     {
         // Check if user already exists
@@ -48,9 +54,14 @@ class UserService
         }
 
         // Set role to Admin using enum
-        $userDetails->role = role::admin;
+        $userDetails->role = role::visitor;
 
         // Add user to repository
         return $this->repository->addUser($userDetails);
+    }
+
+    public function deleteUser($userId)
+    {
+        return $this->repository->deleteUser($userId);
     }
 }

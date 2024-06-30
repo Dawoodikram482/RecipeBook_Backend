@@ -84,4 +84,9 @@ $query = "SELECT id, username, password, email, role FROM users WHERE id = :id";
         }
         throw new InternalErrorException("Error Processing Request");
     }
+    public function deleteUser($userId)
+    {
+        $query = "DELETE FROM users WHERE id = :userId";
+        return $this->ExecQueryAndGetResults($query, array(":userId" => $userId));
+    }
 }

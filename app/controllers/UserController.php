@@ -42,7 +42,8 @@ class UserController extends AbstractController
             "nbf" => $notBefore, // Use current time for nbf
             "data" => array(
                 "id" => $user->getId(),
-                "username" => $user->getUsername()
+                "username" => $user->getUsername(),
+                "role" => $user->getUserType()->getRoleType()
             )
         );
         $jwt = JWT::encode($payload, $secret_key, 'HS256');
@@ -50,7 +51,8 @@ class UserController extends AbstractController
             "message" => "Successful login.",
             "jwt" => $jwt,
             "name" => $user->getUsername(),
-            "expiresAt" => $issuedAt + 3600, // Token valid for 1 hour
+            "expiresAt" => $issuedAt + 3600,
+            "role" => $user->getUserType()->getRoleType()
         );
     }
 
@@ -98,5 +100,21 @@ class UserController extends AbstractController
             $this->respondWithError(500, $e->getMessage());
         }
         $this->respond($user);
+    }
+
+    public function delete($id)
+    {
+        $token = $this->checkForJwt();
+        if (empty($token)) {
+            return;
+        }
+        try {
+            $this->userService->deleteUser($id);
+            $this->respond(true);
+            return;
+            $this->respondWithError(403, "You are not authorized to view this page");
+        } catch (\Models\Exceptions\InternalErrorException $e) {
+            $this->respondWithError(500, "Internal Error");
+        }
     }
 }
