@@ -1,6 +1,6 @@
 
 
-**This is the backend of the Task Manager Project for Web Development 2.** The database data can be found under the folder `sql`.
+**This is the backend of the Recipe Book Project for Web Development 2.** The database data can be found under the folder `sql`.
 
 User has to log in with credentials for performing CRUD operations on recipes.
 Regular visitor can browse all recipes and create recipes.
